@@ -41,8 +41,8 @@ void loop() {
   int novoValor = random(1, 4);
   char ent = (char)(novoValor + '0');
   sequencia += ent;
-  Serial.print("sequencia atual: ");
-  Serial.println(sequencia);
+  //Serial.print("sequencia atual: ");
+  //Serial.println(sequencia);
   
   //mostra a sequência
   contador++;
@@ -69,13 +69,12 @@ void loop() {
 
   //espera entrada do usuário
   entradaDoUsuario = "";
-     Serial.print("minha sequencia: ");
+ // Serial.print("minha sequencia: ");
   while (entradaDoUsuario.length() < contador) {
     int estadoBotao1 = digitalRead(botao1);
     int estadoBotao2 = digitalRead(botao2);
     int estadoBotao3 = digitalRead(botao3);
 
-  
     if (estadoBotao1 != lastButton1State || estadoBotao2 != lastButton2State || estadoBotao3 != lastButton3State) {
       lastDebounce = millis();
     }
@@ -84,23 +83,43 @@ void loop() {
       if (estadoBotao1 != button1State) {
         button1State = estadoBotao1;
         if (button1State == LOW) {
-          entradaDoUsuario += '1'; 
+          entradaDoUsuario += '1';
+          //Serial.println(entradaDoUsuario);
           delay(250);
-         
         }
       } else if (estadoBotao2 != button2State) {
         button2State = estadoBotao2;
         if (button2State == LOW) {
           entradaDoUsuario += '2';
-           Serial.println(entradaDoUsuario);
+          //Serial.println(entradaDoUsuario);
           delay(250);
         }
       } else if (estadoBotao3 != button3State) {
         button3State = estadoBotao3;
         if (button3State == LOW) {
           entradaDoUsuario += '3';
-           Serial.println(entradaDoUsuario);
+         // Serial.println(entradaDoUsuario);
           delay(250);
+        }
+      }
+
+      // ✅ Verificação imediata de erro após cada entrada
+      for (int i = 0; i < entradaDoUsuario.length(); i++) {
+        if (entradaDoUsuario[i] != sequencia[i]) {
+          Serial.print("Acertos: ");
+          Serial.println(contador);
+          
+          digitalWrite(led1, HIGH);
+          digitalWrite(led2, HIGH);
+          digitalWrite(led3, HIGH);
+          delay(1000);
+          digitalWrite(led1, LOW);
+          digitalWrite(led2, LOW);
+          digitalWrite(led3, LOW);
+          sequencia = "";
+          contador = 0;
+          delay(500);
+          return;  
         }
       }
     }
@@ -109,23 +128,7 @@ void loop() {
     lastButton2State = estadoBotao2;
     lastButton3State = estadoBotao3;
   }
- 
- 
-  
-  //verifica se a entrada está correta
-  if (sequencia != entradaDoUsuario) {//usuário errou a sequência
-
-    Serial.println("PERDEU");
-    digitalWrite(led1, HIGH);
-    digitalWrite(led2, HIGH);
-    digitalWrite(led3, HIGH);
-    delay(1000);
-    digitalWrite(led1, LOW);
-    digitalWrite(led2, LOW);
-    digitalWrite(led3, LOW);
-    sequencia = "";
-    contador = 0;
-  }
 
   delay(500); // pausa antes de nova rodada
 }
+
